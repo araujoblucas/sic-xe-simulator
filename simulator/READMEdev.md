@@ -1,3 +1,6 @@
+Add JavaFX references
+"vmArgs": "--module-path \"C:/Users/joaov/Documents/javafx-sdk-23.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
+
 ## Getting Started
 
 Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
