@@ -1,16 +1,15 @@
 package Registradores;
 
 public class Registradores {
-
-    public byte[][] regs24bits;
-    public byte[] regs48bits;
+    
+    private Registrador[] registradores;
 
     public Registradores(int numero){
-    
-        regs24bits=new byte[9][3]; // 9 registradores, cada um com 3 bytes
-
-        regs48bits=new byte[6];
-
-        
+        registradores=new Registrador[8]; //temos 8 registradores de 3 bytes cada
     }
+
+    public Registrador[] getRegistradores() {
+        return registradores;
+    }
+    
 }

@@ -1,12 +1,16 @@
 package Memória;
+
+import java.util.ArrayList;
+
 public class Memoria {
     
-    public Palavramem[] memoria; //Vetor palavramem
+    public ArrayList<Palavramem> memoria; //Vetor palavramem
 
     public Memoria(){
-        memoria= new Palavramem[1000];//1000 posições
+        memoria= new ArrayList<>();//Mudei para arraylist pois tem mais flexibilidade
+
         for(int i=0; i<1000; i++){
-            memoria[i]= new Palavramem();//cada posição 3 bytes
+            memoria.add(new Palavramem());//cada posição 3 bytes
         }
     }
 }
