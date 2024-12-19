@@ -1,8 +1,8 @@
 package Registradores;
 public class Registradores {
 
-    private Registrador[] registradores;
-
+private Registrador[] registradores;
+    
     public Registradores() {
         registradores = new Registrador[8]; 
         for(int i=0; i<8; i++){
@@ -12,6 +12,7 @@ public class Registradores {
     public Registrador getRegistradores(int reg) {
         return registradores[reg];
     }
-
-    
+    public Registrador[] getAllRegistradores() { 
+        return registradores;
+    }
 }

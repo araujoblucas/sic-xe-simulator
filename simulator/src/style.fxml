@@ -2,16 +2,15 @@
 
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
-   <children>
-      <TableView fx:id="TabelaReg" layoutX="394.0" layoutY="14.0" prefHeight="200.0" prefWidth="192.0">
-        <columns>
-          <TableColumn prefWidth="93.0" text="Registradores" />
-          <TableColumn prefWidth="98.0" text="Valor Atual" />
-        </columns>
-      </TableView>
-   </children>
-</AnchorPane>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+    <children>
+        <TableView fx:id="TabelaReg">
+            <columns>
+                <TableColumn fx:id="registerColumn" text="Register" />
+                <TableColumn fx:id="valueColumn" text="Value" />
+            </columns>
+        </TableView>
+    </children>
+</VBox>

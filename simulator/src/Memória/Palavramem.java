@@ -15,5 +15,8 @@ public class Palavramem {
         bytes[1] = b2;
         bytes[2] = b3;  
     }
+    public byte[] getBytes(){ 
+        return bytes;
+    }
 
 }

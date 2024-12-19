@@ -1,3 +1,5 @@
+
+import Memória.Memoria;
 import Registradores.Registradores;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -5,16 +7,26 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class App extends Application{
-    public static void main(String[] args) throws Exception {
+public class App extends Application {
+
+    private Memoria memoria;
+    private Registradores registradores;
+
+    public static void main(String[] args) {
         launch(args);
-        Registradores reg= new Registradores();
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        
-        Parent root = FXMLLoader.load(getClass().getResource("style.fxml"));
+        memoria = new Memoria();
+        registradores = new Registradores();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("style.fxml"));
+        Parent root = loader.load();
+
+        // Obter o controlador e passar os dados
+        Controller controller = loader.getController();
+        controller.updateRegistradores(registradores);
 
         Scene scene = new Scene(root);
         primaryStage.setTitle("Simulador SIC");
