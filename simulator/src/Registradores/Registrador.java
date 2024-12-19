@@ -1,5 +1,6 @@
 package Registradores;
 
+
 public class Registrador {
     private byte[] reg;
 

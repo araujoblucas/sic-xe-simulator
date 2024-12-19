@@ -1,5 +1,6 @@
 package Memória;
 
+
 public class Palavramem {
 
     private byte[] bytes; //Criando o tipo byte(8 bits)
