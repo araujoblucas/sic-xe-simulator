@@ -3,12 +3,15 @@ public class Registradores {
 
     private Registrador[] registradores;
 
-    public Registradores(int numero){
-        registradores=new Registrador[8]; //temos 8 registradores de 3 bytes cada (professor disse que o de ponto flutuante nao precisa)
+    public Registradores() {
+        registradores = new Registrador[8]; 
+        for(int i=0; i<8; i++){
+            registradores[i]=new Registrador();
+        }
     }
-
     public Registrador getRegistradores(int reg) {
         return registradores[reg];
     }
+
     
 }
