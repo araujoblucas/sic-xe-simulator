@@ -25,7 +25,7 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("style.fxml"));
         Parent root = loader.load();
 
-        // Obter o controlador e passar os dados
+        // Aqui eu instancio uma classe controller e dps chamo o metodo updateRegistradores que passa nosso objeto registradores
         Controller controller = loader.getController();
         controller.updateRegistradores(registradores);
 
