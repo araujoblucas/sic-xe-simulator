@@ -5,14 +5,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="478.0" prefWidth="507.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="Controller">
+<VBox prefHeight="478.0" prefWidth="507.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
     <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
-              <TableView fx:id="TabelaReg" layoutX="130.0" layoutY="25.0">
+              <TableView fx:id="TabelaReg" layoutX="219.0" layoutY="25.0">
                   <columns>
-                      <TableColumn fx:id="registerColumn" text="Register" />
-                      <TableColumn fx:id="valueColumn" text="Value" />
+                      <TableColumn fx:id="registerColumn" text="Registrador" />
+                      <TableColumn fx:id="valueColumn" text="Valor" />
                   </columns>
               </TableView>
          </children>

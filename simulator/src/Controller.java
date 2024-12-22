@@ -23,7 +23,7 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        // Configura as colunas
+        // Chatgptzei aqui revisar dps
         registerColumn.setCellValueFactory(new PropertyValueFactory<>("registerName"));
         valueColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getValueAsString()));
 
