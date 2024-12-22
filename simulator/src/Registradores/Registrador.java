@@ -17,10 +17,10 @@ public class Registrador {
         reg[2] = b3;
     }
 
-    public String getValueAsString() {
+    public String getValor(){
         StringBuilder hexValue = new StringBuilder();
-        for (byte b : reg) {
-            hexValue.append(String.format("%02X", b));
+        for (int i=0; i<3; i++) {
+            hexValue.append(String.format("%02X",  reg[i]));
         }
         return hexValue.toString();
     }

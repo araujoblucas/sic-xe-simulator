@@ -25,7 +25,7 @@ public class Controller {
     public void initialize() {
         // Chatgptzei aqui revisar dps
         registerColumn.setCellValueFactory(new PropertyValueFactory<>("registerName"));
-        valueColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getValueAsString()));
+        valueColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getValor()));
 
         // Inicialize o TableView
         TabelaReg.setItems(registradores);
