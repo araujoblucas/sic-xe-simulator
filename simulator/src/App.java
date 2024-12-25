@@ -23,6 +23,7 @@ public class App extends Application {
 
         // Configuração de exemplo para preencher algumas posições de memória
         //****Essa parte deve ser "automatizada" lendo um arquivo futuramente****
+        registradores.registradores[0].setReg((byte) 0x01, (byte) 0x02, (byte) 0x03);
         memoria.memoria.get(0).setValor((byte) 0x01, (byte) 0x02, (byte) 0x03);
         memoria.memoria.get(1).setValor((byte) 0x0A, (byte) 0x0B, (byte) 0x0C);
 

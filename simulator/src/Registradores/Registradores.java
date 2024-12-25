@@ -1,7 +1,7 @@
 package Registradores;
 public class Registradores {
 
-private Registrador[] registradores;
+public Registrador[] registradores;
     
     public Registradores() {
         registradores = new Registrador[8]; 
