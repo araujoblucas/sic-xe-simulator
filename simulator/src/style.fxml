@@ -5,17 +5,34 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="478.0" prefWidth="507.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
-    <children>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0">
-         <children>
-              <TableView fx:id="TabelaReg" layoutX="219.0" layoutY="25.0">
-                  <columns>
-                      <TableColumn fx:id="registerColumn" text="Registrador" />
-                      <TableColumn fx:id="valueColumn" text="Valor" />
-                  </columns>
-              </TableView>
-         </children>
-      </AnchorPane>
-    </children>
-</VBox>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ScrollPane?>
+<SplitPane orientation="HORIZONTAL" xmlns:fx="http://javafx.com/fxml" fx:controller="Controller">
+    <items>
+        <!-- Tabela de Registradores -->
+        <VBox spacing="10">
+            <Label text="Registradores" />
+            <TableView fx:id="TabelaReg">
+                <columns>
+                    <TableColumn fx:id="registerColumn" text="Register" />
+                    <TableColumn fx:id="valueColumn" text="Value" />
+                </columns>
+            </TableView>
+        </VBox>
+        <!-- Tabela de Memória -->
+        <VBox spacing="10">
+            <Label text="Memória" />
+            <ScrollPane fitToWidth="true">
+                <content>
+                    <TableView fx:id="TabelaMem">
+                        <columns>
+                            <TableColumn fx:id="memoryIndexColumn" text="Posição" />
+                            <TableColumn fx:id="memoryValueColumn" text="Conteúdo (3 Bytes)" />
+                        </columns>
+                    </TableView>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </items>
+</SplitPane>

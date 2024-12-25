@@ -20,18 +20,25 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         memoria = new Memoria();
         registradores = new Registradores();
-        registradores.getRegistradores(1).setReg((byte) 0x01, (byte) 0x02, (byte) 0x03);
+
+        // Configuração de exemplo para preencher algumas posições de memória
+        //****Essa parte deve ser "automatizada" lendo um arquivo futuramente****
+        memoria.memoria.get(0).setValor((byte) 0x01, (byte) 0x02, (byte) 0x03);
+        memoria.memoria.get(1).setValor((byte) 0x0A, (byte) 0x0B, (byte) 0x0C);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("style.fxml"));
         Parent root = loader.load();
 
-        // Aqui eu instancio uma classe controller e dps chamo o metodo updateRegistradores que passa nosso objeto registradores
+        // Obter o controlador e passar os dados
         Controller controller = loader.getController();
         controller.updateRegistradores(registradores);
+        controller.updateMemoria(memoria);
 
         Scene scene = new Scene(root);
         primaryStage.setTitle("Simulador SIC");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+
 }
