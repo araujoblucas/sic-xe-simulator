@@ -1,13 +1,7 @@
 package Montador;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Assembler {
 
@@ -22,6 +16,11 @@ public class Assembler {
 
             makeSymbolTable(input, instructionSet);
 
+            Map<String, Integer> symbolTable = readSymbolTable("pass1_symbol_table.txt");
+
+            File sourceFile = new File("codigoFonte.asm");
+
+            secondPass(sourceFile, instructionSet, symbolTable);
 
 
             // Exemplo de como acessar uma instrução específica
@@ -55,10 +54,6 @@ public class Assembler {
                 if (line.contains("START")) {
                     String valueStart = parts[parts.length == 3 ? 2 : 1];
                     position = Integer.parseInt(valueStart, 16); // Define o endereço inicial
-
-                    if(parts.length == 3) {
-
-                    }
 
                     continue;
                 }
@@ -138,16 +133,46 @@ public class Assembler {
                 // Processar diretiva END
                 if (parts[0].equals("END")) {
                     lines.add(new Lines(position, "", "END", parts.length > 1 ? parts[1] : ""));
-
-
-
                     continue;
                 }
 
-                // Identificar partes da linha
                 String label = (parts.length == 3) ? parts[0] : "     ";
                 String mnemonic = (parts.length == 3) ? parts[1] : parts[0];
                 String value = (parts.length == 3) ? parts[2] : (parts.length == 2 ? parts[1] : "");
+
+                System.out.println(line);
+                if (line.contains("RSUB")) {
+                    System.out.println("CAIUAQUI");
+                    if (parts.length == 2) {
+                        label = parts[0];
+                        mnemonic = parts[1];
+                        value = "     ";
+
+                        if (!label.isEmpty() && !label.equals("     ")) {
+                            if (symbolTable.containsKey(label)) {
+                                System.out.println("Erro: Rótulo duplicado - " + label);
+                            } else {
+                                symbolTable.put(label, position);
+                            }
+                        }
+
+                    } else {
+                        label = "     ";
+                        mnemonic = parts[0];
+                        value = "     ";
+                    }
+
+                    Instruction instruction = instructionSet.get(mnemonic);
+                    if (instruction != null) {
+                        position += instruction.getFormat();
+                        lines.add(new Lines(position, label, mnemonic, value));
+                    } else {
+                        System.out.println("Erro: Instrução desconhecida ou mal formatada - " + mnemonic);
+                    }
+
+                    continue;
+
+                }
 
                 // Processar diretivas específicas
                 if (mnemonic.equalsIgnoreCase("WORD")) {
@@ -162,7 +187,6 @@ public class Assembler {
                             symbolTable.put(label, position);
                         }
                     }
-
                     continue;
                 }
 
@@ -182,17 +206,18 @@ public class Assembler {
                     continue;
                 }
 
+
                 // Processar instruções padrão
                 Instruction instruction = instructionSet.get(mnemonic);
                 if (instruction != null) {
                     position += instruction.getFormat();
                     lines.add(new Lines(position, label, mnemonic, value));
                 } else {
-                    // Registrar erro para mnemônicos desconhecidos
                     System.out.println("Erro: Instrução desconhecida ou mal formatada - " + mnemonic);
                 }
 
                 // Se houver um rótulo, adicioná-lo à tabela de símbolos
+                System.out.println("Parte:" + parts[0] + " Label:" + label);
                 if (!label.isEmpty() && !label.equals("     ")) {
                     if (symbolTable.containsKey(label)) {
                         System.out.println("Erro: Rótulo duplicado - " + label);
@@ -294,10 +319,10 @@ public class Assembler {
         private String value;
 
         public Lines(
-                 int address,
-                 String label,
-                 String mnemonic,
-                 String value
+                int address,
+                String label,
+                String mnemonic,
+                String value
         ) {
             this.address = address;
             this.label = label;
@@ -338,5 +363,100 @@ public class Assembler {
         public String value() {
             return value;
         }
+    }
+
+    private static void secondPass(File file, Map<String, Instruction> instructionSet, Map<String, Integer> symbolTable) throws FileNotFoundException {
+        int position = 0;
+
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().trim();
+
+                // Ignorar linhas vazias ou comentários
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
+
+                String[] parts = line.split("\\s+");
+
+                // Processar diretiva START
+                if (line.contains("START")) {
+                    String valueStart = parts[parts.length == 3 ? 2 : 1];
+                    position = Integer.parseInt(valueStart, 16); // Define o endereço inicial
+                    continue;
+                }
+
+                // Processar diretiva END
+                if (parts[0].equals("END")) {
+                    continue;
+                }
+
+                // Identificar partes da linha
+                String label = (parts.length == 3) ? parts[0] : "";
+                String mnemonic = (parts.length == 3) ? parts[1] : parts[0];
+                String value = (parts.length == 3) ? parts[2] : (parts.length == 2 ? parts[1] : "");
+
+                // Gerar código objeto para instruções padrão
+                Instruction instruction = instructionSet.get(mnemonic);
+                if (instruction != null) {
+                    int format = instruction.getFormat();
+                    String opcode = instruction.getOpcode();
+
+                    // Resolver o endereço do operando, se houver
+                    int operandAddress = 0;
+                    if (!value.isEmpty()) {
+                        if (symbolTable.containsKey(value)) {
+                            operandAddress = symbolTable.get(value);
+                        } else {
+                            System.out.println("Erro: Rótulo não definido - " + value);
+                        }
+                    }
+
+                    // Gerar o código objeto (exemplo simplificado)
+                    String objectCode = opcode + String.format("%04X", operandAddress);
+                    System.out.println(String.format("%04X", position) + " " + objectCode);
+
+                    position += format;
+                } else {
+                    // Processar diretivas específicas
+                    if (mnemonic.equalsIgnoreCase("WORD")) {
+                        int wordValue = Integer.parseInt(value);
+                        String objectCode = String.format("%06X", wordValue);
+                        System.out.println(String.format("%04X", position) + " " + objectCode);
+                        position += 3;
+                    } else if (mnemonic.equalsIgnoreCase("RESW")) {
+                        position += 3 * Integer.parseInt(value);
+                    } else {
+                        // Registrar erro para mnemônicos desconhecidos
+                        System.out.println("Erro: Instrução desconhecida ou mal formatada - " + mnemonic);
+                    }
+                }
+            }
+        }
+    }
+
+    public static Map<String, Integer> readSymbolTable(String fileName) {
+        Map<String, Integer> symbolTable = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Divide a linha em partes usando espaços como delimitadores
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length == 2) {
+                    String symbol = parts[0];
+                    // Converte o valor hexadecimal para um inteiro
+                    int address = Integer.parseInt(parts[1], 16);
+                    symbolTable.put(symbol, address);
+                } else {
+                    System.out.println("Linha mal formatada: " + line);
+                }
+            }
+            System.out.println("Arquivo '" + fileName + "' foi lido com sucesso.");
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+        }
+
+        return symbolTable;
     }
 }
