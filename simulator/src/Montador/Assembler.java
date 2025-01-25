@@ -1,4 +1,4 @@
-package Assembler;
+package Montador;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -99,6 +99,8 @@ public class Assembler {
     private static ArrayList<Lines> readInputFile(Map<String, Instruction> instructionSet) throws FileNotFoundException {
         File file = new File("codigoFonte.asm");
         ArrayList<Lines> lines = new ArrayList<>();
+        Map<String, Integer> symbolTable = new HashMap<>();
+
         int position = 0;
 
         try (Scanner scanner = new Scanner(file)) {
@@ -120,12 +122,25 @@ public class Assembler {
                     System.out.println("Label: " + labelStart + " Value: " + valueStart);
                     position = Integer.parseInt(valueStart, 16); // Define o endereço inicial
                     lines.add(new Lines(position, labelStart, "START", valueStart));
+
+                    // Se houver um rótulo, adicioná-lo à tabela de símbolos
+                    if (!labelStart.isEmpty() && !labelStart.equals("     ")) {
+                        if (symbolTable.containsKey(labelStart)) {
+                            System.out.println("Erro: Rótulo duplicado - " + labelStart);
+                        } else {
+                            symbolTable.put(labelStart, position);
+                        }
+                    }
+
                     continue;
                 }
 
                 // Processar diretiva END
                 if (parts[0].equals("END")) {
                     lines.add(new Lines(position, "", "END", parts.length > 1 ? parts[1] : ""));
+
+
+
                     continue;
                 }
 
@@ -138,12 +153,32 @@ public class Assembler {
                 if (mnemonic.equalsIgnoreCase("WORD")) {
                     position += 3;
                     lines.add(new Lines(position, label, "WORD", value));
+
+                    // Se houver um rótulo, adicioná-lo à tabela de símbolos
+                    if (!label.isEmpty() && !label.equals("     ")) {
+                        if (symbolTable.containsKey(label)) {
+                            System.out.println("Erro: Rótulo duplicado - " + label);
+                        } else {
+                            symbolTable.put(label, position);
+                        }
+                    }
+
                     continue;
                 }
 
                 if (mnemonic.equalsIgnoreCase("RESW")) {
                     position += 3 * Integer.parseInt(value);
                     lines.add(new Lines(position, label, "RESW", value));
+
+                    // Se houver um rótulo, adicioná-lo à tabela de símbolos
+                    if (!label.isEmpty() && !label.equals("     ")) {
+                        if (symbolTable.containsKey(label)) {
+                            System.out.println("Erro: Rótulo duplicado - " + label);
+                        } else {
+                            symbolTable.put(label, position);
+                        }
+                    }
+
                     continue;
                 }
 
@@ -156,13 +191,23 @@ public class Assembler {
                     // Registrar erro para mnemônicos desconhecidos
                     System.out.println("Erro: Instrução desconhecida ou mal formatada - " + mnemonic);
                 }
+
+                // Se houver um rótulo, adicioná-lo à tabela de símbolos
+                if (!label.isEmpty() && !label.equals("     ")) {
+                    if (symbolTable.containsKey(label)) {
+                        System.out.println("Erro: Rótulo duplicado - " + label);
+                    } else {
+                        symbolTable.put(label, position);
+                    }
+                }
+
             }
+
+            writeSymbolTable(symbolTable);
         }
 
         return lines;
     }
-
-
 
 
     // Função para carregar as instruções do arquivo e preencher o HashMap
@@ -211,16 +256,17 @@ public class Assembler {
         }
     }
 
-    public static void writeSymbolTable(int address, String label, String value) {
+    private static void writeSymbolTable(Map<String, Integer> symbolTable) {
         try (FileWriter writer = new FileWriter("pass1_symbol_table.txt")) {
-
-            writer.write(String.format("%04X", address).toUpperCase() + " " + label + " " + value + "\n");
-
-            System.out.println("Arquivo 'intermediate_file.txt' foi criado com sucesso.");
+            for (Map.Entry<String, Integer> entry : symbolTable.entrySet()) {
+                writer.write(String.format("%-10s %04X\n", entry.getKey(), entry.getValue()));
+            }
+            System.out.println("Arquivo 'pass1_symbol_table.txt' foi criado com sucesso.");
         } catch (IOException e) {
             System.out.println("Erro ao escrever o arquivo: " + e.getMessage());
         }
     }
+
 
     // Classe para armazenar o formato e opcode de cada instrução
     static class Instruction {
