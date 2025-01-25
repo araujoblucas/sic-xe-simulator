@@ -3,3 +3,5 @@ launch.json
 out
 .idea
 sic-xe-simulator.iml
+pass1_intermediate_file.txt
+pass1_symbol_table.txt
