@@ -3,11 +3,12 @@ TEST    START   1000
         ADD     BETA
         JSUB    SUBR
         COMP    GAMMA
-        JEQ     END
+        JEQ     END_LABEL
         LDA     GAMMA
         ADD     BETA
 ALPHA   WORD    1234
 BETA    WORD    5678
 GAMMA   WORD    9ABC
 SUBR    RESW    1
+END_LABEL RSUB
         END     TEST
