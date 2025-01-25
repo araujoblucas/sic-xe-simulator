@@ -1,2 +1,5 @@
 settings.json
 launch.json
+out
+.idea
+sic-xe-simulator.iml
