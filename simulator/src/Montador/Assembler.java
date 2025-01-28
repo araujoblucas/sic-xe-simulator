@@ -156,6 +156,11 @@ public class Assembler {
                             }
                         }
 
+                        System.out.println("Position" + position + " Label: " + label + " Mnemonic: " + mnemonic + " Value: " + value);
+                        lines.add(new Lines(position, label, mnemonic, value));
+
+                        continue;
+
                     } else {
                         label = "     ";
                         mnemonic = parts[0];
@@ -390,11 +395,24 @@ public class Assembler {
                 if (parts[0].equals("END")) {
                     continue;
                 }
+                String label = "";
+                String mnemonic = "";
+                String value = "";
 
-                // Identificar partes da linha
-                String label = (parts.length == 3) ? parts[0] : "";
-                String mnemonic = (parts.length == 3) ? parts[1] : parts[0];
-                String value = (parts.length == 3) ? parts[2] : (parts.length == 2 ? parts[1] : "");
+                if (line.contains("RSUB")) {
+                    label = (parts.length == 2) ? parts[0] : "";
+                    mnemonic = (parts.length == 2) ? parts[1] : parts[0];
+                    value = "     ";
+
+                    continue;
+                } else {
+                    // Identificar partes da linha
+                    label = (parts.length == 3) ? parts[0] : "";
+                    mnemonic = (parts.length == 3) ? parts[1] : parts[0];
+                    value = (parts.length == 3) ? parts[2] : (parts.length == 2 ? parts[1] : "");
+                }
+
+
 
                 // Gerar código objeto para instruções padrão
                 Instruction instruction = instructionSet.get(mnemonic);
