@@ -22,6 +22,9 @@ public class Assembler {
 
             secondPass(sourceFile, instructionSet, symbolTable);
 
+            String intermediateFile = "pass2_intermediate_file.txt";
+            String outputFile = "object_code.txt";
+            generateObjectCode(intermediateFile, outputFile);
 
             // Exemplo de como acessar uma instrução específica
             Instruction addInstruction = instructionSet.get("ADD");
@@ -31,6 +34,8 @@ public class Assembler {
 
         } catch (FileNotFoundException e) {
             System.out.println("Arquivo não encontrado: " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -370,85 +375,83 @@ public class Assembler {
         }
     }
 
-    private static void secondPass(File file, Map<String, Instruction> instructionSet, Map<String, Integer> symbolTable) throws FileNotFoundException {
+    public static void secondPass(File file, Map<String, Instruction> instructionSet, Map<String, Integer> symbolTable) throws IOException {
         int position = 0;
+        List<String> intermediateTable = new ArrayList<>();
 
-        try (Scanner scanner = new Scanner(file)) {
+        try (Scanner scanner = new Scanner(file);
+             BufferedWriter writer = new BufferedWriter(new FileWriter("pass2_intermediate_file.txt"))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
 
-                // Ignorar linhas vazias ou comentários
                 if (line.isEmpty() || line.startsWith("#")) {
                     continue;
                 }
 
                 String[] parts = line.split("\\s+");
 
-                // Processar diretiva START
-                if (line.contains("START")) {
-                    String valueStart = parts[parts.length == 3 ? 2 : 1];
-                    position = Integer.parseInt(valueStart, 16); // Define o endereço inicial
-                    continue;
-                }
-
-                // Processar diretiva END
-                if (parts[0].equals("END")) {
-                    continue;
-                }
                 String label = "";
                 String mnemonic = "";
                 String value = "";
+
+                if (line.contains("START")) {
+                    String valueStart = parts[parts.length == 3 ? 2 : 1];
+                    position = Integer.parseInt(valueStart, 16);
+                    value = parts[parts.length == 3 ? 2 : 1];
+                    mnemonic = (parts.length == 3) ? parts[1] : parts[0];
+                    value = (parts.length == 3) ? parts[2] : (parts.length == 2 ? parts[1] : "");
+
+                    String outputLine = String.format("%04X %s %s %s %s", position, label, mnemonic, value, valueStart);
+                    intermediateTable.add(outputLine);
+
+                    continue;
+                }
+                if (parts[0].equals("END")) {
+                    continue;
+                }
+
+
 
                 if (line.contains("RSUB")) {
                     label = (parts.length == 2) ? parts[0] : "";
                     mnemonic = (parts.length == 2) ? parts[1] : parts[0];
                     value = "     ";
-
-                    continue;
                 } else {
-                    // Identificar partes da linha
                     label = (parts.length == 3) ? parts[0] : "";
                     mnemonic = (parts.length == 3) ? parts[1] : parts[0];
                     value = (parts.length == 3) ? parts[2] : (parts.length == 2 ? parts[1] : "");
                 }
 
-
-
-                // Gerar código objeto para instruções padrão
                 Instruction instruction = instructionSet.get(mnemonic);
                 if (instruction != null) {
                     int format = instruction.getFormat();
                     String opcode = instruction.getOpcode();
-
-                    // Resolver o endereço do operando, se houver
                     int operandAddress = 0;
-                    if (!value.isEmpty()) {
-                        if (symbolTable.containsKey(value)) {
-                            operandAddress = symbolTable.get(value);
-                        } else {
-                            System.out.println("Erro: Rótulo não definido - " + value);
-                        }
+                    if (!value.isEmpty() && symbolTable.containsKey(value)) {
+                        operandAddress = symbolTable.get(value);
                     }
-
-                    // Gerar o código objeto (exemplo simplificado)
                     String objectCode = opcode + String.format("%04X", operandAddress);
-                    System.out.println(String.format("%04X", position) + " " + objectCode);
-
+                    String outputLine = String.format("%04X %s %s %s %s", position, label, mnemonic, value, objectCode);
+                    intermediateTable.add(outputLine);
                     position += format;
                 } else {
-                    // Processar diretivas específicas
                     if (mnemonic.equalsIgnoreCase("WORD")) {
                         int wordValue = Integer.parseInt(value);
                         String objectCode = String.format("%06X", wordValue);
-                        System.out.println(String.format("%04X", position) + " " + objectCode);
+                        String outputLine = String.format("%04X %s %s %s %s", position, label, mnemonic, value, objectCode);
+                        intermediateTable.add(outputLine);
                         position += 3;
                     } else if (mnemonic.equalsIgnoreCase("RESW")) {
                         position += 3 * Integer.parseInt(value);
                     } else {
-                        // Registrar erro para mnemônicos desconhecidos
-                        System.out.println("Erro: Instrução desconhecida ou mal formatada - " + mnemonic);
+                        intermediateTable.add("Erro: Instrução desconhecida - " + mnemonic);
                     }
                 }
+            }
+
+            for (String line : intermediateTable) {
+                writer.write(line);
+                writer.newLine();
             }
         }
     }
@@ -477,4 +480,92 @@ public class Assembler {
 
         return symbolTable;
     }
+
+    public static void generateObjectCode(String intermediateFile, String outputFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(intermediateFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+
+            String programName = "";
+            int startAddress = 0;
+            int lastAddress = 0;
+            List<String> textRecords = new ArrayList<>();
+            StringBuilder currentRecord = new StringBuilder();
+            int currentRecordStart = -1;
+            int currentRecordLength = 0;
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Divide a linha em partes, considerando espaços e tabulações
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length < 4) continue;
+
+                int address = Integer.parseInt(parts[0], 16);
+                String label = parts[1];
+                String mnemonic = parts[2];
+                String objectCode = parts[3];
+
+                System.out.println("Linha processada: " + line);
+                System.out.println("Current Record: " + currentRecord.toString());
+                System.out.println("Current Record Start: " + Integer.toHexString(currentRecordStart));
+                System.out.println("Current Record Length: " + currentRecordLength);
+                System.out.println("Text Records: " + textRecords.toString());
+
+                if (mnemonic.equals("START")) {
+                    programName = label;
+                    startAddress = address;
+                    lastAddress = startAddress;
+                } else if (mnemonic.equals("END")) {
+                    // Finaliza o último registro de texto, se houver
+                    if (currentRecordLength > 0) {
+                        textRecords.add(String.format("T^%06X^%02X^%s", currentRecordStart, currentRecordLength, currentRecord.toString()));
+                    }
+                    break;
+                } else {
+                    if (currentRecordStart == -1) {
+                        currentRecordStart = address;
+                    }
+
+                    int objectCodeLength = objectCode.length() / 2; // Cada par de caracteres hexadecimais representa 1 byte
+
+                    // Verifica se adicionar este código objeto excederia 30 bytes
+                    if (currentRecordLength + objectCodeLength >= 30) {
+                        // Finaliza o registro de texto atual
+                        textRecords.add(String.format("T^%06X^%02X^%s", currentRecordStart, currentRecordLength, currentRecord.toString()));
+                        // Inicia um novo registro de texto
+                        currentRecord = new StringBuilder();
+                        currentRecordStart = address;
+                        currentRecordLength = 0;
+                    }
+
+                    // Adiciona o código objeto ao registro atual, se existir
+                    if (!objectCode.equals("null")) {
+                        currentRecord.append(objectCode).append("^");
+                        currentRecordLength += objectCodeLength;
+                    }
+
+                    // Atualiza lastAddress considerando o tamanho do código objeto
+                    lastAddress = address + objectCodeLength;
+                }
+            }
+
+            // Escreve o registro de cabeçalho
+            int programLength = lastAddress - startAddress;
+            writer.write(String.format("H^%-6s^%06X^%06X\n", programName, startAddress, programLength));
+
+            // Escreve os registros de texto
+            for (String record : textRecords) {
+                // Remove o '^' final antes de escrever o registro
+                writer.write(record.substring(0, record.length() - 1) + "\n");
+            }
+
+            // Escreve o registro de fim
+            writer.write(String.format("E^%06X\n", startAddress));
+
+            System.out.println("Código objeto gerado com sucesso no arquivo: " + outputFile);
+
+        } catch (IOException e) {
+            System.err.println("Erro ao processar o arquivo: " + e.getMessage());
+        }
+    }
+
 }
