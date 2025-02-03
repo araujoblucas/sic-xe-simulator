@@ -4,10 +4,24 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.ScrollPane;
 import Memória.Memoria;
 import Memória.Palavramem;
 import Registradores.Registradores;
 import Registradores.Registrador;
+import javafx.stage.FileChooser;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import Montador.Assembler;
+import javafx.stage.Stage;
 
 public class Controller {
 
@@ -27,6 +41,21 @@ public class Controller {
 
     @FXML
     private TableColumn<Palavramem, String> memoryIndexColumn;
+    
+    @FXML
+    private TextField arquivoInput;
+
+    @FXML
+    private Button carregarArquivoBtn;
+
+    @FXML
+    private Button montarBtn;
+
+    @FXML
+    private TextArea fonteTextArea;
+
+    @FXML
+    private TextArea saidaTextArea;
 
     @FXML
     private TableColumn<Palavramem, String> memoryValueColumn;
@@ -77,4 +106,76 @@ public class Controller {
         }
         return hexValue.toString().trim();
     }
+    
+
+    private Stage stage;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    @FXML
+    private void carregarArquivo() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Arquivos ASM", "*.asm"));
+        File file = fileChooser.showOpenDialog(stage);
+
+        if (file != null) {
+            arquivoInput.setText(file.getAbsolutePath());
+            lerArquivo(file);
+        }
+    }
+
+    private void lerArquivo(File file) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            StringBuilder conteudo = new StringBuilder();
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                conteudo.append(linha).append("\n");
+            }
+            fonteTextArea.setText(conteudo.toString());
+        } catch (IOException e) {
+            fonteTextArea.setText("Erro ao ler o arquivo!");
+        }
+    }
+    @FXML
+    private void limparCampos() {
+        arquivoInput.clear();
+        fonteTextArea.clear();
+        saidaTextArea.clear();
+    }
+
+    @FXML
+    private void executarMontador() {
+        String arquivoEntrada = arquivoInput.getText();
+        String arquivoSaida = "object_code.txt";
+    
+        if (arquivoEntrada.isEmpty()) {
+            saidaTextArea.setText("Erro: Nenhum arquivo .asm selecionado!");
+            return;
+        }
+    
+        try {
+            Assembler montador = new Assembler();
+            montador.montar(arquivoEntrada, arquivoSaida);
+    
+            File arquivoSaidaFile = new File(arquivoSaida);
+            if (!arquivoSaidaFile.exists()) {
+                saidaTextArea.setText("Erro: Arquivo de saída não encontrado!");
+                return;
+            }
+    
+            try (BufferedReader br = new BufferedReader(new FileReader(arquivoSaidaFile))) {
+                StringBuilder conteudo = new StringBuilder();
+                String linha;
+                while ((linha = br.readLine()) != null) {
+                    conteudo.append(linha).append("\n");
+                }
+                saidaTextArea.setText(conteudo.toString());
+            }
+    
+        } catch (Exception e) {
+            saidaTextArea.setText("Erro ao executar o montador!");
+        }
+    }    
 }

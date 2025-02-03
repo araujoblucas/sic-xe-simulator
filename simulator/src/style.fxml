@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<SplitPane dividerPositions="0.5" orientation="HORIZONTAL" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="Controller">
+<SplitPane dividerPositions="0.3, 0.5" orientation="HORIZONTAL"
+           xmlns:fx="http://javafx.com/fxml/1"
+           xmlns="http://javafx.com/javafx/23.0.1"
+           fx:controller="Controller">
     <items>
         <!-- Tabela de Registradores -->
         <VBox spacing="10">
@@ -19,6 +18,7 @@
                 </columns>
             </TableView>
         </VBox>
+
         <!-- Tabela de Memória -->
         <VBox spacing="10">
             <Label text="Memória" />
@@ -32,6 +32,38 @@
                     </TableView>
                 </content>
             </ScrollPane>
+        </VBox>
+
+        <!-- Seção do Montador -->
+        <VBox spacing="10" alignment="CENTER">
+            <Label text="Montador SIC" />
+
+            <TextField fx:id="arquivoInput" promptText="Digite o nome do arquivo .asm" />
+
+            <!-- Botões acima da caixa de código-fonte -->
+            <HBox spacing="10">
+                <Button fx:id="carregarArquivoBtn" text="Carregar Arquivo" onAction="#carregarArquivo" />
+                <Button fx:id="montarBtn" text="Montar" onAction="#executarMontador" />
+                <Button fx:id="limparBtn" text="Limpar" onAction="#limparCampos" />
+            </HBox>
+
+            <VBox spacing="5">
+                <Label text="Código-fonte do Montador" />
+                <ScrollPane fitToWidth="true">
+                    <content>
+                        <TextArea fx:id="fonteTextArea" promptText="Código fonte .asm..." editable="false" wrapText="true"/>
+                    </content>
+                </ScrollPane>
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Código Montado" />
+                <ScrollPane fitToWidth="true">
+                    <content>
+                        <TextArea fx:id="saidaTextArea" promptText="Código de saída..." editable="false" wrapText="true"/>
+                    </content>
+                </ScrollPane>
+            </VBox>
         </VBox>
     </items>
 </SplitPane>
