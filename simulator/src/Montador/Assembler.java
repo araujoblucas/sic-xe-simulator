@@ -145,9 +145,8 @@ public class Assembler {
                 String mnemonic = (parts.length == 3) ? parts[1] : parts[0];
                 String value = (parts.length == 3) ? parts[2] : (parts.length == 2 ? parts[1] : "");
 
-                System.out.println(line);
+
                 if (line.contains("RSUB")) {
-                    System.out.println("CAIUAQUI");
                     if (parts.length == 2) {
                         label = parts[0];
                         mnemonic = parts[1];
@@ -161,7 +160,6 @@ public class Assembler {
                             }
                         }
 
-                        System.out.println("Position" + position + " Label: " + label + " Mnemonic: " + mnemonic + " Value: " + value);
                         lines.add(new Lines(position, label, mnemonic, value));
 
                         continue;
@@ -342,24 +340,6 @@ public class Assembler {
 
         public String address() {
             return String.format("%04X", address).toUpperCase();
-
-//            String stringAddress = Integer.toHexString(address);
-//            int length = stringAddress.length();
-//            System.out.println("Address " + address + "Address lenght" + length);
-//            if (length == 4) {
-//                return stringAddress;
-//            }
-//
-//            int expectedLength = 4;
-//            if (expectedLength - length > 0) {
-//                while(expectedLength != length) {
-//                    stringAddress = "0" + stringAddress;
-//                    System.out.println(stringAddress);
-//                    length++;
-//                }
-//            }
-//            return stringAddress;
-
         }
 
         public String label() {
@@ -395,13 +375,12 @@ public class Assembler {
                 String value = "";
 
                 if (line.contains("START")) {
-                    String valueStart = parts[parts.length == 3 ? 2 : 1];
-                    position = Integer.parseInt(valueStart, 16);
                     value = parts[parts.length == 3 ? 2 : 1];
+                    position = Integer.parseInt(value, 16);
                     mnemonic = (parts.length == 3) ? parts[1] : parts[0];
-                    value = (parts.length == 3) ? parts[2] : (parts.length == 2 ? parts[1] : "");
+                    label = (parts.length == 3) ? parts[0] : "";
 
-                    String outputLine = String.format("%04X %s %s %s %s", position, label, mnemonic, value, valueStart);
+                    String outputLine = String.format("%04X %s %s %s", position, label, mnemonic, value);
                     intermediateTable.add(outputLine);
 
                     continue;
