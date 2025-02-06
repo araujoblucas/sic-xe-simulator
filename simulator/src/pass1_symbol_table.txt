@@ -1,0 +1,6 @@
+GAMMA      101E
+TEST       1000
+SUBR       1021
+ALPHA      1018
+BETA       101B
+END_LABEL  1021

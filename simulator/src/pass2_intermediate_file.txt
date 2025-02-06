@@ -1,28 +1,12 @@
-TEST    START   1000 - Erro: Instrução desconhecida
-
-LDA     ALPHA - Erro: Instrução desconhecida
-
-ADD     BETA - Erro: Instrução desconhecida
-
-JSUB    SUBR - Instrução válida
-
-COMP    GAMMA - Erro: Instrução desconhecida
-
-JEQ     END_LABEL - Erro: Instrução desconhecida
-
-LDA     GAMMA - Erro: Instrução desconhecida
-
-ADD     BETA - Erro: Instrução desconhecida
-
-ALPHA   WORD    1234 - Erro: Instrução desconhecida
-
-BETA    WORD    5678 - Erro: Instrução desconhecida
-
-GAMMA   WORD    9999 - Erro: Instrução desconhecida
-
-SUBR    RESW    1 - Erro: Instrução desconhecida
-
-END_LABEL RSUB - Instrução válida
-
-END     TEST - Erro: Instrução desconhecida
-
+1000 TEST START 1000
+1000  LDA ALPHA 001018
+1003  ADD BETA 18101B
+1006  JSUB SUBR 481021
+1009  COMP GAMMA 28101E
+100C  JEQ END_LABEL 301021
+100F  LDA GAMMA 00101E
+1012  ADD BETA 18101B
+1015 ALPHA WORD 1234 0004D2
+1018 BETA WORD 5678 00162E
+101B GAMMA WORD 9999 00270F
+1021 END_LABEL RSUB       4C0000

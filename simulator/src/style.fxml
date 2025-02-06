@@ -40,7 +40,6 @@
 
             <TextField fx:id="arquivoInput" promptText="Digite o nome do arquivo .asm" />
 
-            <!-- Botões acima da caixa de código-fonte -->
             <HBox spacing="10">
                 <Button fx:id="carregarArquivoBtn" text="Carregar Arquivo" onAction="#carregarArquivo" />
                 <Button fx:id="montarBtn" text="Montar" onAction="#executarMontador" />
